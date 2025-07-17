@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Распознавание текста и цены</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .file-input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+            background-color: #f9f9f9;
+        }
+        .price-info {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 5px;
+        }
+        .confidence {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Распознавание текста и цены</h1>
+            <p>Загрузите изображение с ценником для автоматического распознавания цены за килограмм</p>
+        </div>
+        
+        <form id="uploadForm" class="upload-form">
+            <input type="file" name="image" accept="image/*" required class="file-input">
+            <br>
+            <button type="submit" class="submit-btn" id="submitBtn">Распознать текст</button>
+        </form>
+        
+        <div id="result"></div>
+        <div id="priceInfo" class="price-info" style="display: none;">
+            <h3>Информация о цене:</h3>
+            <p><strong>Цена за кг:</strong> <span id="pricePerKg"></span> ₽</p>
+            <p><strong>Вес:</strong> <span id="weight"></span> <span id="unit"></span></p>
+            <p><strong>Цена за единицу:</strong> <span id="price"></span> ₽</p>
+            <div class="confidence">
+                <strong>Уверенность распознавания:</strong> <span id="confidence"></span>%
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const resultDiv = document.getElementById('result');
+            const priceInfoDiv = document.getElementById('priceInfo');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Обработка...';
+            resultDiv.innerHTML = '<div class="loading">Обрабатываем изображение...</div>';
+            priceInfoDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/v1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<strong>Распознанный текст:</strong><br>${data.text}`;
+                    
+                    if (data.price_info) {
+                        document.getElementById('pricePerKg').textContent = data.price_info.price_per_kg;
+                        document.getElementById('weight').textContent = data.price_info.weight;
+                        document.getElementById('unit').textContent = data.price_info.unit;
+                        document.getElementById('price').textContent = data.price_info.price;
+                        document.getElementById('confidence').textContent = Math.round(data.price_info.confidence * 100);
+                        priceInfoDiv.style.display = 'block';
+                    } else {
+                        priceInfoDiv.style.display = 'none';
+                    }
+                    
+                    if (data.error) {
+                        resultDiv.innerHTML += `<div class="error">${data.error}</div>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    priceInfoDiv.style.display = 'none';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Ошибка при отправке запроса</div>';
+                priceInfoDiv.style.display = 'none';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Распознать текст';
+            }
+        };
+    </script>
+</body>
+</html> 
