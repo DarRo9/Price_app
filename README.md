@@ -9,19 +9,6 @@ Price Recognition App
 <img width="538" height="341" alt="Screenshot from 2025-07-17 01-43-09" src="https://github.com/user-attachments/assets/5bfa76e7-035a-4fd7-92a9-a4a976c27f21" />
 
 
-```
-backend/
-├── cmd/main.go              # Точка входа
-├── internal/
-│   ├── domain/              # Доменные модели
-│   ├── usecase/             # Бизнес-логика
-│   ├── repository/          # Интерфейсы и реализации репозиториев
-│   └── delivery/            # HTTP handlers и роутинг
-├── configs/                 # Конфигурация
-├── web/                     # Веб-интерфейс
-└── pkg/                     # Общие пакеты
-```
-
 ## Возможности
 
 - Распознавание текста на русском языке с изображений
