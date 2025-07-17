@@ -3,6 +3,8 @@ Price Recognition App
 Приложение для распознавания цен на изображениях и расчета цены за килограмм.
 ## Пример
 
+После локального запуска было загружено фото ценника по localhost:8080 в браузере. В результате были распознаны вес и цена, а также была расчитана цена за кг
+
 <img width="703" height="594" alt="Screenshot from 2025-07-17 01-58-15" src="https://github.com/user-attachments/assets/495ddc89-302a-43dd-839d-070836cfdf96" />
 <img width="538" height="341" alt="Screenshot from 2025-07-17 01-43-09" src="https://github.com/user-attachments/assets/5bfa76e7-035a-4fd7-92a9-a4a976c27f21" />
 
